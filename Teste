@@ -1,0 +1,72 @@
+package login;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class User {
+
+    // Método responsável por realizar a conexão com o banco de dados
+    public Connection conectarBD() {
+        Connection conn = null;
+        try {
+            // Carrega o driver do MySQL
+            Class.forName("com.mysql.Driver.Manager").newInstance();
+
+            // URL de conexão (contém host, banco, usuário e senha)
+            String url = "jdbc:mysql://127.0.0.1/test?user=lopes&password=123";
+
+            // Estabelece a conexão
+            conn = DriverManager.getConnection(url);
+
+        } catch (Exception e) {
+            // Exceção não tratada (ideal: exibir ou registrar erro)
+        }
+
+        // Retorna a conexão criada (ou null caso tenha falhado)
+        return conn;
+    }
+
+    // Atributo que armazena o nome do usuário encontrado
+    public String nome = "";
+
+    // Atributo que indica se o usuário foi autenticado com sucesso
+    public boolean result = false;
+
+    // Método que verifica se o login e senha existem no banco de dados
+    public boolean verificarUsuario(String login, String senha) {
+
+        String sql = "";
+        Connection conn = conectarBD();
+
+        // Montagem do comando SQL
+        sql = "select nome from usuarios ";
+        sql += "where login = '" + login + "'";
+        sql += " and senha = '" + senha + "'";
+
+        try {
+            // Cria um Statement para executar a consulta
+            Statement st = conn.createStatement();
+
+            // Executa a consulta e armazena o resultado
+            ResultSet rs = st.executeQuery(sql);
+
+            // Verifica se retornou algum registro
+            if (rs.next()) {
+                // Obtém o nome do usuário do resultado da consulta
+                nome = rs.getString("nome");
+
+                // Define que a autenticação teve sucesso
+                result = true;
+            }
+
+        } catch (Exception e) {
+            // Exceção ignorada (ideal: logar o erro)
+        }
+
+        // Retorna se o usuário foi encontrado ou não
+        return result;
+    }
+}
+// fim da classe
